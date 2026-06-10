@@ -1,0 +1,11 @@
+# Server
+server/node_modules/
+server/.env
+
+# Root dependencies
+node_modules/
+.vscode/
+.agents/
+
+# Logs
+*.log
