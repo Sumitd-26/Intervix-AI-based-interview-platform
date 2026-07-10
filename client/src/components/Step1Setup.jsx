@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
-import toast from "react-hot-toast";
 import {
   FaUserTie,
   FaBriefcase,
@@ -57,8 +56,8 @@ function Step1Setup({ onStart }) {
   };
 
   const handleStart = async () => {
-   if (userData?.credits <= 0) {
-  toast.error("You have no interview credits left.");
+  if (userData?.credits <= 0) {
+  alert("You don't have enough interview credits. Please purchase a plan to continue.");
   navigate("/pricing");
   return;
 }
