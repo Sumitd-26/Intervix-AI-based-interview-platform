@@ -77,8 +77,12 @@ function Step1Setup({ onStart }) {
       setLoading(false);
       onStart(result.data);
     } catch (error) {
-      setLoading(false);
-    }
+  setLoading(false);
+
+  if (error.response?.status === 400) {
+    navigate("/pricing");
+  }
+}
   };
 
   return (
