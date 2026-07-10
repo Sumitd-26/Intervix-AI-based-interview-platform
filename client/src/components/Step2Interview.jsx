@@ -270,7 +270,7 @@ function Step2Interview({ interviewData, onFinish }) {
         {/* video section */}
         <div className="w-full lg:w-[35%] bg-white flex flex-col items-center p-6 space-y-6 border-r border-gray-200">
          <div className="w-full max-w-md">
-  <div className="relative h-80 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 shadow-xl overflow-hidden flex flex-col items-center justify-center">
+  <div className="relative h-80 rounded-3xl bg-gradient-to-br from-emerald-500 to-teal-500 shadow-xl overflow-hidden flex flex-col items-center justify-center">
 
     {/* Ripple animation */}
     {isAIPlaying && (
