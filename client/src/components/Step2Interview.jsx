@@ -1,6 +1,5 @@
 import React from "react";
-import maleVideo from "../assets/videos/male-ai.mp4";
-import femaleVideo from "../assets/videos/female-ai.mp4";
+import { HiSpeakerWave } from "react-icons/hi2";
 import Timer from "./Timer";
 import { motion } from "motion/react";
 import { FaMicrophone, FaMicrophoneSlash } from "react-icons/fa";
@@ -25,54 +24,26 @@ function Step2Interview({ interviewData, onFinish }) {
   const [timeLeft, setTimeLeft] = useState(questions[0]?.timeLimit || 60);
   const [selectedVoice, setSelectedVoice] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [voiceGender, setVoiceGender] = useState("female");
   const [subtitle, setSubtitle] = useState("");
   const [isTimerRunning, setIsTimerRunning] = useState(false);
 
-  const videoRef = useRef(null);
-
   const currentQuestion = questions[currentIndex];
 
-  useEffect(() => {
-    const loadVoices = () => {
-      const voices = window.speechSynthesis.getVoices();
-      if (!voices.length) return;
+ useEffect(() => {
+  const loadVoices = () => {
+    const voices = window.speechSynthesis.getVoices();
+    if (!voices.length) return;
 
-      const femaleVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("zira") ||
-          v.name.toLowerCase().includes("samantha") ||
-          v.name.toLowerCase().includes("female"),
-      );
+    const preferredVoice =
+      voices.find((v) => v.lang.startsWith("en")) || voices[0];
 
-      if (femaleVoice) {
-        setSelectedVoice(femaleVoice);
-        setVoiceGender("female");
-        return;
-      }
+    setSelectedVoice(preferredVoice);
+  };
 
-      const maleVoice = voices.find(
-        (v) =>
-          v.name.toLowerCase().includes("david") ||
-          v.name.toLowerCase().includes("mark") ||
-          v.name.toLowerCase().includes("male"),
-      );
+  loadVoices();
+  window.speechSynthesis.onvoiceschanged = loadVoices;
+}, []);
 
-      if (maleVoice) {
-        setSelectedVoice(maleVoice);
-        setVoiceGender("male");
-        return;
-      }
-
-      setSelectedVoice(voices[0]);
-      setVoiceGender("female");
-    };
-
-    loadVoices();
-    window.speechSynthesis.onvoiceschanged = loadVoices;
-  }, []);
-
-  const videoSource = voiceGender === "male" ? maleVideo : femaleVideo;
 
   const speakText = (text) => {
     return new Promise((resolve) => {
@@ -96,23 +67,22 @@ function Step2Interview({ interviewData, onFinish }) {
       utterance.volume = 1;
 
       utterance.onstart = () => {
-        setIsAIPlaying(true);
-        stopMic();
-        videoRef.current?.play();
-      };
+  setIsAIPlaying(true);
+  stopMic();
+};
 
       utterance.onend = () => {
-        videoRef.current?.pause();
-        videoRef.current.currentTime = 0;
-        setIsAIPlaying(false);
-        if (isMicOn) {
-          startMic();
-        }
-        setTimeout(() => {
-          setSubtitle("");
-          resolve();
-        }, 300);
-      };
+  setIsAIPlaying(false);
+
+  if (isMicOn) {
+    startMic();
+  }
+
+  setTimeout(() => {
+    setSubtitle("");
+    resolve();
+  }, 300);
+};
 
       setSubtitle(text);
 
@@ -299,17 +269,56 @@ function Step2Interview({ interviewData, onFinish }) {
       <div className="w-full max-w-350 min-h-[80vh] bg-white rounded-3xl shadow-2xl border border-gray-200 flex flex-col lg:flex-row overflow-hidden">
         {/* video section */}
         <div className="w-full lg:w-[35%] bg-white flex flex-col items-center p-6 space-y-6 border-r border-gray-200">
-          <div className="w-full max-w-md rounded-2xl overflow-hidden shadow-xl">
-            <video
-              src={videoSource}
-              key={videoSource}
-              ref={videoRef}
-              muted
-              playsInline
-              preload="auto"
-              className="w-full h-auto object-cover"
-            />
-          </div>
+         <div className="w-full max-w-md">
+  <div className="relative h-80 rounded-3xl bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-500 shadow-xl overflow-hidden flex flex-col items-center justify-center">
+
+    {/* Ripple animation */}
+    {isAIPlaying && (
+      <>
+        <div className="absolute w-44 h-44 rounded-full border-2 border-white/30 animate-ping"></div>
+
+        <div
+          className="absolute w-60 h-60 rounded-full border border-white/20 animate-ping"
+          style={{ animationDelay: "0.4s" }}
+        ></div>
+
+        <div
+          className="absolute w-80 h-80 rounded-full border border-white/10 animate-ping"
+          style={{ animationDelay: "0.8s" }}
+        ></div>
+      </>
+    )}
+
+    {/* Speaker */}
+    <div
+      className={`relative z-10 flex items-center justify-center w-28 h-28 rounded-full bg-white shadow-2xl transition-all duration-300 ${
+        isAIPlaying ? "animate-pulse scale-110" : ""
+      }`}
+    >
+      <HiSpeakerWave size={60} className="text-emerald-600" />
+    </div>
+
+    {/* Equalizer */}
+    <div className="relative z-10 flex items-end gap-2 mt-10 h-14">
+      {[32, 20, 44, 26, 38, 24, 34].map((height, index) => (
+        <div
+          key={index}
+          className={`w-2 rounded-full bg-white ${
+            isAIPlaying ? "animate-bounce" : ""
+          }`}
+          style={{
+            height: `${height}px`,
+            animationDelay: `${index * 0.08}s`,
+          }}
+        />
+      ))}
+    </div>
+
+    <p className="relative z-10 mt-8 text-white font-semibold text-lg">
+      {isAIPlaying ? "AI is Speaking..." : "Waiting..."}
+    </p>
+  </div>
+</div>
           {/* subtitle */}
 
           {subtitle && (
